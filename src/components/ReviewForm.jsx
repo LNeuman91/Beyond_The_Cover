@@ -1,38 +1,15 @@
 // ReviewForm.jsx
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useAddReviewMutation } from '../Slice/apiSlice';
-import { useSelector } from 'react-redux';
 
-const ReviewForm = () => {
-  const { id } = useParams(); // Get the book ID from the URL
+const ReviewForm = ({ onSubmit }) => { 
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(0);
-  const token = useSelector((state) => state.auth.token);
-  const [addReview] = useAddReviewMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!token) {
-      alert('Please log in to submit a review.');
-      return;
-    }
-
-    try {
-      await addReview({
-        bookId: id,
-        review: {
-          text: reviewText,
-          rating,
-        },
-      }).unwrap();
+      onSubmit({ text: reviewText, rating }); 
       setReviewText('');
       setRating(0);
-      alert('Review submitted successfully!');
-    } catch (error) {
-      console.error('Error submitting review:', error);
-      alert('Failed to submit review. Please try again later.');
-    }
   };
 
   return (
@@ -50,7 +27,7 @@ const ReviewForm = () => {
         <select
           id="rating"
           value={rating}
-          onChange={(e) => setRating(parseInt(e.target.value, 10))}
+          onChange={(e) => setRating(parseInt(e.target.value, 10))} 
         >
           <option value={0}>Select Rating</option>
           {[1, 2, 3, 4, 5].map((value) => (

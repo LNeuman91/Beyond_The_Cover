@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useGetBooksQuery } from '../Slice/apiSlice.js';
 import { useState } from 'react';
 
-const BookList = () => {
+const Books = () => {
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useGetBooksQuery();
   const [searchTerm, setSearchTerm] = useState('');
 
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error}</div>;
+  // if (isError) return <div>Error: {error}</div>;
 
   const books = data?.books || [];
 
@@ -23,7 +23,7 @@ const BookList = () => {
 
   return (
     <div>
-      <h1>Welcome to my Book Club!</h1>
+      <h1>Welcome to my Book Review Site!</h1>
       <h2>Book List</h2>
 
       <input
@@ -39,7 +39,7 @@ const BookList = () => {
               <li key={book.id}>
                 <strong>{book.title}</strong>
                 <br />
-                by {book.author}
+                <p>by {book.author}</p>
                 <br />
                 <button
                   className="btn btn-primary"
@@ -58,4 +58,4 @@ const BookList = () => {
   );
 };
 
-export default BookList;
+export default Books;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import BookList from './components/Books';
+import Books from './components/Books';
 import Navigation from './components/Navigation';
 import Login from './components/Login';
 import SingleBook from './components/SingleBook';
@@ -14,7 +14,7 @@ const App = () => {
       <BrowserRouter>
         <Navigation />
         <Routes>
-          <Route path="/" element={<BookList />} />
+          <Route path="/" element={<Books />} />
           <Route path="/books/:id" element={<SingleBook />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registration />} />

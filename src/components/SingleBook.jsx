@@ -1,50 +1,41 @@
 // SingleBook.jsx
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   useGetBookByIdQuery,
-  useUpdateBookAvailabilityMutation,
-  useLazyGetReservationsQuery,
   useAddReviewMutation,
   useGetReviewsByBookIdQuery,
-} from '../Slice/apiSlice';
-import { useSelector } from 'react-redux';
-import ReviewForm from './ReviewForm'; // Assuming ReviewForm is in the same directory
+} from "../Slice/apiSlice";
+import { useSelector } from "react-redux";
+import ReviewForm from "./ReviewForm";
 
 const SingleBook = () => {
   const { id } = useParams();
-  const { data, isLoading, isError } = useGetBookByIdQuery(id);
-  const [updateBookAvailability] = useUpdateBookAvailabilityMutation();
-  const [isCheckedOut, setIsCheckedOut] = useState(false);
+  const { data: bookData, isLoading: bookLoading, isError: bookError } = useGetBookByIdQuery(id);
   const token = useSelector((state) => state.auth.token);
-  const [refetchReservations] = useLazyGetReservationsQuery();
   const [addReview] = useAddReviewMutation();
-  const { data: reviewsData, isLoading: loadingReviews } =
-    useGetReviewsByBookIdQuery(id);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const { data: reviewsData, isLoading: reviewsLoading, isError: reviewsError, refetch: refetchReviews } = useGetReviewsByBookIdQuery(id);
   const reviews = reviewsData?.reviews;
 
-  const book = data?.book;
+  const book = bookData?.book;
 
-  if (isLoading) return <p>Loading book details...</p>;
-  if (isError || !book) {
-    console.error('Error or no book data:', { isError, book });
+  if (bookLoading) return <p>Loading book details...</p>;
+  if (bookError || !book) {
+    console.error("Error or no book data:", { bookError, book });
     return <p>Error loading book details. Please try again later.</p>;
   }
 
-  const handleCheckout = async () => {
-    if (!token) {
-      alert('Please log in to check out this book.');
-      return;
-    }
-
+  const HandleAddReview = async (reviewData) => {
     try {
-      await updateBookAvailability({ bookId: id, available: false }).unwrap();
-      await refetchReservations();
-      alert('Book checked out successfully!');
-      setIsCheckedOut(true);
+      alert("Review Successfully added")
+      // await addReview({ bookId: id, review: reviewData }).unwrap();
+      // setShowReviewForm(false);
+      // alert("Review submitted successfully!");
+      // refetchReviews(); // Refetch reviews after submission
     } catch (error) {
-      console.error('Checkout failed:', error);
-      alert('Failed to check out the book. Please try again later.');
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again later.");
     }
   };
 
@@ -56,25 +47,11 @@ const SingleBook = () => {
         <h1>{book.title}</h1>
         <p>Author: {book.author}</p>
         <p>Description: {book.description}</p>
-        {token ? (
-          <button
-            className="btn btn-primary"
-            onClick={handleCheckout}
-            disabled={isCheckedOut}
-          >
-            {isCheckedOut ? 'Checked Out' : 'Checkout'}
-          </button>
-        ) : (
-          <button className="btn btn-primary" disabled={true}>
-            Login to Checkout
-          </button>
-        )}
       </div>
-      {/* Review Functionality */}
       <h3>Reviews</h3>
-      {loadingReviews ? (
+      {reviewsLoading ? (
         <p>Loading reviews...</p>
-      ) : (
+      ) : reviews && Array.isArray(reviews) && reviews.length > 0 ? (
         <ul>
           {reviews.map((review) => (
             <li key={review.id}>
@@ -83,8 +60,19 @@ const SingleBook = () => {
             </li>
           ))}
         </ul>
+      ) : (
+        <p>No reviews yet.</p>
       )}
-      <ReviewForm /> {/* Include the ReviewForm component */}
+
+      {token ? (
+        showReviewForm ? (
+          <ReviewForm onSubmit={HandleAddReview} />
+        ) : (
+          <button className="btn btn-primary" onClick={() => setShowReviewForm(true)}>Add Review</button>
+        )
+      ) : (
+        <p>Login to add a review.</p>
+      )}
     </>
   );
 };

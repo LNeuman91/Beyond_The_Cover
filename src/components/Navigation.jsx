@@ -37,13 +37,13 @@ const Navigation = () => {
         )}
         {isLoggedIn && (
           <Link to="/account">
-            <span className="material-symbols-outlined">person</span>
+            <span className="material-symbols-outlined"></span>
             Account
           </Link>
         )}
         {isLoggedIn && (
           <button onClick={handleLogout}>
-            <span className="material-symbols-outlined">logout</span>
+            <span className="material-symbols-outlined"></span>
             Logout
           </button>
         )}

@@ -29,6 +29,9 @@ export const apiSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
+    getReviewsByBookId: builder.query({
+      query: (bookId) => `/books/${bookId}/reviews`,
+    }),
     getBooks: builder.query({
       query: () => '/books', 
     }),
@@ -77,14 +80,13 @@ export const apiSlice = createApi({
         method: 'DELETE',
       }),
     }),
-    //Book review endpoint:
-addReview: builder.mutation({
-  query: ({ bookId, review }) => ({
-    url: `/books/${bookId}/reviews`,
-    method: 'POST',
-    body: review,
-  }),
-}),
+    addReview: builder.mutation({
+      query: ({ bookId, review }) => ({
+        url: `/books/${bookId}/reviews`,
+        method: 'POST',
+        body: review,
+      }),
+    }),
   }),
 });
 export const {
@@ -97,6 +99,8 @@ export const {
   useUpdateBookAvailabilityMutation,
   useGetReservationsQuery,
   useLazyGetReservationsQuery,
+  useGetReviewsByBookIdQuery,
+  useAddReviewMutation,
 } = apiSlice;
 
 export default apiSlice.reducer;
